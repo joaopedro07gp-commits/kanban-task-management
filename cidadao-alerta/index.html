@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cidadão Alerta - Protótipo UX</title>
+    <!-- Bibliotecas base -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind para estilização ultrarrápida -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+      /* Estilo base para simular tela de celular no Desktop */
+      body { 
+          background-color: #000; 
+          display: flex; 
+          justify-content: center; 
+          min-height: 100vh; 
+          margin: 0; 
+          font-family: system-ui, -apple-system, sans-serif; 
+      }
+      #root { 
+          width: 100%; 
+          max-width: 414px; 
+          background-color: #121214; 
+          min-height: 100vh; 
+          position: relative; 
+          box-shadow: 0 0 30px rgba(0,0,0,0.8); 
+          overflow: hidden; 
+      }
+      
+      /* UX Micro-interações */
+      .btn-press { transition: transform 0.1s, background-color 0.2s; }
+      .btn-press:active { transform: scale(0.96); }
+      .fade-in { animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+      
+      @keyframes fadeIn { 
+          from { opacity: 0; transform: translateY(15px); } 
+          to { opacity: 1; transform: translateY(0); } 
+      }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Ícones SVG minimalistas (estilo Lucide) para manter o arquivo único e leve
+        const AlertTriangle = () => <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>;
+        const MapPin = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>;
+        const CameraIcon = () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>;
+        const CheckCircle = () => <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>;
+        const Trash = () => <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>;
+        const Zap = () => <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>;
+        const ArrowLeft = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>;
+
+        function App() {
+            const [step, setStep] = useState(1);
+            const [category, setCategory] = useState('');
+
+            // Clique 1: Escolher Categoria
+            const handleCategorySelect = (cat) => {
+                setCategory(cat);
+                setStep(2);
+            };
+
+            // Clique 2: Tirar Foto
+            const handleCapturePhoto = () => {
+                setStep(3);
+            };
+
+            // Clique 3: Enviar Relatório
+            const handleSubmitReport = () => {
+                setStep(4);
+            };
+
+            return (
+                <div className="w-full min-h-screen text-white flex flex-col relative">
+                    
+                    {/* Header Padrão */}
+                    {step < 4 && (
+                        <div className="bg-[#202024] p-5 flex items-center border-b border-gray-800 shadow-md z-10">
+                            {step > 1 && (
+                                <button onClick={() => setStep(step - 1)} className="mr-4 text-gray-400 btn-press">
+                                    <ArrowLeft />
+                                </button>
+                            )}
+                            <div>
+                                <h1 className="text-xl font-bold text-white tracking-wide">Cidadão Alerta</h1>
+                                <p className="text-xs text-gray-400 font-medium tracking-wider uppercase mt-1">Ação em 3 cliques</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* TELA 1: DESCOBERTA E CATEGORIA */}
+                    {step === 1 && (
+                        <div className="flex-1 p-6 fade-in flex flex-col bg-[#121214]">
+                            <h2 className="text-3xl font-extrabold mb-2 text-white">O que você viu?</h2>
+                            <p className="text-gray-400 mb-8 text-base font-medium">Toque para reportar instantaneamente.</p>
+                            
+                            <div className="flex flex-col gap-4">
+                                <button onClick={() => handleCategorySelect('Buraco na Via')} className="btn-press bg-[#202024] p-5 rounded-2xl flex items-center gap-5 border border-gray-800 hover:border-red-500 text-left shadow-lg">
+                                    <div className="bg-red-500/20 text-red-500 p-4 rounded-xl">
+                                        <AlertTriangle />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold text-white">Buraco na Via</h3>
+                                        <p className="text-sm text-gray-400 mt-1">Asfalto cedido ou rachaduras</p>
+                                    </div>
+                                </button>
+
+                                <button onClick={() => handleCategorySelect('Luz Quebrada')} className="btn-press bg-[#202024] p-5 rounded-2xl flex items-center gap-5 border border-gray-800 hover:border-yellow-500 text-left shadow-lg">
+                                    <div className="bg-yellow-500/20 text-yellow-500 p-4 rounded-xl">
+                                        <Zap />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold text-white">Luz Quebrada</h3>
+                                        <p className="text-sm text-gray-400 mt-1">Poste apagado ou piscando</p>
+                                    </div>
+                                </button>
+
+                                <button onClick={() => handleCategorySelect('Lixo Acumulado')} className="btn-press bg-[#202024] p-5 rounded-2xl flex items-center gap-5 border border-gray-800 hover:border-emerald-500 text-left shadow-lg">
+                                    <div className="bg-emerald-500/20 text-emerald-500 p-4 rounded-xl">
+                                        <Trash />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold text-white">Lixo Irregular</h3>
+                                        <p className="text-sm text-gray-400 mt-1">Descarte em calçada ou via</p>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* TELA 2: CÂMERA (A EVIDÊNCIA) */}
+                    {step === 2 && (
+                        <div className="flex-1 bg-black fade-in flex flex-col relative">
+                            {/* Simulação de visor da câmera */}
+                            <div className="flex-1 bg-gray-900 relative overflow-hidden flex items-center justify-center">
+                                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
+                                    <div className="w-56 h-56 border-2 border-white/40 rounded-xl relative">
+                                        <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-white -mt-1 -ml-1"></div>
+                                        <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-white -mt-1 -mr-1"></div>
+                                        <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-white -mb-1 -ml-1"></div>
+                                        <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-white -mb-1 -mr-1"></div>
+                                    </div>
+                                    <p className="mt-6 text-white font-medium bg-black/50 px-4 py-1 rounded-full">Enquadre o problema</p>
+                                </div>
+                                {/* Efeito de câmera */}
+                                <div className="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMSIvPgo8L3N2Zz4=')]"></div>
+                            </div>
+                            
+                            {/* Controles da câmera */}
+                            <div className="h-40 bg-black flex items-center justify-center pb-8 pt-4">
+                                <button onClick={handleCapturePhoto} className="btn-press w-24 h-24 bg-white rounded-full border-4 border-gray-400 flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+                                    <div className="w-20 h-20 bg-white rounded-full border-2 border-gray-300"></div>
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* TELA 3: CONFIRMAÇÃO (O ENVIO) */}
+                    {step === 3 && (
+                        <div className="flex-1 p-6 fade-in flex flex-col bg-[#121214]">
+                            <h2 className="text-2xl font-extrabold mb-6 text-white">Revisar Informações</h2>
+                            
+                            <div className="bg-[#202024] rounded-2xl p-5 mb-5 border border-gray-800 flex gap-5 items-center shadow-lg">
+                                <div className="w-24 h-24 bg-gray-800/80 rounded-xl flex items-center justify-center text-gray-500 border border-gray-700">
+                                    <CameraIcon />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-lg text-white">{category}</h3>
+                                    <p className="text-xs text-green-400 font-bold mt-2 flex items-center gap-1 bg-green-400/10 inline-flex px-2 py-1 rounded">
+                                        <MapPin /> GPS Capturado
+                                    </p>
+                                    <p className="text-xs text-gray-500 mt-1">Av. Paulista, 1000 - SP</p>
+                                </div>
+                            </div>
+
+                            <textarea 
+                                placeholder="Adicione uma observação (Opcional)" 
+                                className="w-full bg-[#202024] p-5 rounded-2xl text-white border border-gray-800 focus:outline-none focus:border-emerald-500 mb-auto resize-none shadow-inner h-32"
+                            ></textarea>
+
+                            <button onClick={handleSubmitReport} className="btn-press mt-6 w-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold py-5 rounded-2xl text-xl flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(16,185,129,0.4)]">
+                                Enviar Denúncia
+                            </button>
+                        </div>
+                    )}
+
+                    {/* TELA 4: SUCESSO (O FEEDBACK) */}
+                    {step === 4 && (
+                        <div className="flex-1 p-8 fade-in flex flex-col items-center justify-center text-center bg-[#121214]">
+                            <div className="w-32 h-32 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mb-6 shadow-[0_0_50px_rgba(16,185,129,0.2)]">
+                                <CheckCircle />
+                            </div>
+                            <h2 className="text-3xl font-extrabold mb-3 text-white">Relato Enviado!</h2>
+                            <p className="text-gray-400 mb-10 text-base font-medium leading-relaxed">As equipes da prefeitura já receberam sua localização exata e a evidência.</p>
+                            
+                            <div className="bg-[#202024] p-6 rounded-2xl border border-gray-800 w-full mb-10 shadow-lg">
+                                <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">Protocolo Gerado</p>
+                                <p className="text-4xl font-mono font-bold text-emerald-500 mt-2">#2026</p>
+                                <p className="text-sm text-gray-400 mt-4">Enviaremos atualizações por SMS.</p>
+                            </div>
+
+                            <button onClick={() => { setCategory(''); setStep(1); }} className="btn-press w-full bg-[#29292E] hover:bg-gray-700 text-white font-bold py-5 rounded-2xl border border-gray-700">
+                                Voltar ao Início
+                            </button>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
