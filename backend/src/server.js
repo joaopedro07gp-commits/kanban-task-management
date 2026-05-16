@@ -8,19 +8,23 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// --- ROTAS ---
+const router = express.Router();
 
 // Rotas de Autenticação
-app.use('/api/auth', authRoutes);
+router.use('/api/auth', authRoutes);
 
 // Rotas de Tarefas (CRUD)
-app.use('/api/tasks', taskRoutes);
+router.use('/api/tasks', taskRoutes);
 
 // Health check
-app.get('/api/health', (req, res) => {
+router.get('/api/health', (req, res) => {
   if (!db) return res.status(500).json({ status: 'error', detail: 'Firebase não inicializado' });
   res.json({ status: 'ok', db: 'connected' });
 });
+
+// Aplicar o router tanto na raiz quanto no prefixo da Vercel
+app.use('/_/backend', router);
+app.use('/', router);
 
 // Resposta para rotas não encontradas
 app.use((req, res) => {
