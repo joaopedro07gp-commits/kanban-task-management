@@ -39,3 +39,6 @@ yarn-error.log*
 # Custom
 .agent/
 .gemini/
+
+.vercel
+scratch/

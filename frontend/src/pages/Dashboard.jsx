@@ -29,7 +29,9 @@ export default function Dashboard({ setAuth }) {
 
   const fetchTasks = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/tasks', {
+      const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+      const API_URL = isProduction ? '/_/backend' : (import.meta.env.VITE_API_URL || 'http://localhost:3001');
+      const res = await fetch(`${API_URL}/api/tasks`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       if (res.ok) {
@@ -104,7 +106,8 @@ export default function Dashboard({ setAuth }) {
 
       // Atualiza na API
       try {
-        await fetch(`http://localhost:3001/api/tasks/${taskId}/status`, {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        await fetch(`${API_URL}/api/tasks/${taskId}/status`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -129,7 +132,8 @@ export default function Dashboard({ setAuth }) {
       setSystemError('');
       const isEditing = !!taskData.id;
       
-      const endpoint = isEditing ? `http://localhost:3001/api/tasks/${taskData.id}` : 'http://localhost:3001/api/tasks';
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const endpoint = isEditing ? `${API_URL}/api/tasks/${taskData.id}` : `${API_URL}/api/tasks`;
       const method = isEditing ? 'PUT' : 'POST';
 
       const res = await fetch(endpoint, {
@@ -154,7 +158,8 @@ export default function Dashboard({ setAuth }) {
   const handleDeleteTask = async (taskId) => {
     try {
       setSystemError('');
-      const res = await fetch(`http://localhost:3001/api/tasks/${taskId}`, {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const res = await fetch(`${API_URL}/api/tasks/${taskId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
